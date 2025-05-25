@@ -21,4 +21,9 @@ class Student extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    public function rankings()
+    {
+        return $this->hasMany(Ranking::class, 'student_id', 'user_id');
+    }
 }
