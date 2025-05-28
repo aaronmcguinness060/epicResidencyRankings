@@ -13,9 +13,6 @@ class Residency extends Model
         'company_id',
         'salary',
         'description',
-        'line_manager_name',
-        'line_manager_email',
-        'title',
     ];
 
     /**

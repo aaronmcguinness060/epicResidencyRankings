@@ -13,31 +13,55 @@ class ResidenciesController extends Controller
     // Get all residencies
     public function index()
     {
-        $residencies = Residency::all();
-        return response()->json($residencies);
+        $residencies = Residency::with('company')->get();
+
+        $formatted = $residencies->map(function ($residency) {
+            return [
+                'id' => $residency->id,
+                'company_id' => $residency->company_id,
+                'company_name' => $residency->company->company_name ?? null,
+                'salary' => $residency->salary,
+                'description' => $residency->description,
+                'created_at' => $residency->created_at,
+                'updated_at' => $residency->updated_at,
+            ];
+        });
+
+        return response()->json($formatted);
     }
 
     // Create a new residency/job
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'company_id'        => ['required', 'exists:companies,company_id'],
-            'salary'            => ['required', 'integer', 'min:0', 'max:9999'],
-            'description'       => ['nullable', 'string', 'max:255'],
-            'line_manager_name' => ['nullable', 'string', 'max:100'],
-            'line_manager_email'=> ['nullable', 'email', 'max:100'],
-            'title'             => ['required', 'string', 'max:50'],
+            'company_id'  => ['required', 'exists:companies,company_id'],
+            'salary'      => ['required', 'integer', 'min:0', 'max:9999'],
+            'description' => ['nullable', 'string', 'max:255'],
+            'count'       => ['sometimes', 'integer', 'min:1', 'max:100'] // Optional count param
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $residency = Residency::create($validator->validated());
+        $validated = $validator->validated();
+        $count = $validated['count'] ?? 1; // Default to 1 job if not provided
+
+        $createdResidencies = [];
+
+        for ($i = 0; $i < $count; $i++) {
+            $residency = Residency::create([
+                'company_id'  => $validated['company_id'],
+                'salary'      => $validated['salary'],
+                'description' => $validated['description'] ?? null,
+            ]);
+
+            $createdResidencies[] = $residency;
+        }
 
         return response()->json([
-            'message' => 'Residency (job) created successfully.',
-            'residency' => $residency
+            'message'    => "$count residency job(s) created successfully.",
+            'residencies' => $createdResidencies
         ], 201);
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Ranking;
 
 class RankingsController extends Controller
@@ -27,11 +28,16 @@ class RankingsController extends Controller
     // Store a new ranking
     public function store(Request $request)
     {
+        $user = Auth::user();
+        
+        \Log::info($user);
+
+        $student_id = $user->student->student_id;
+
         $data = $request->all();
 
         // Validate input as an array of rankings
         $validator = Validator::make($request->all(), [
-            '*.student_id'   => ['required', 'exists:students,user_id'],
             '*.residency_id' => ['required', 'exists:residencies,id'],
             '*.position'     => ['required', 'integer', 'min:1'],
         ]);
@@ -44,7 +50,7 @@ class RankingsController extends Controller
         $createdRankings = [];
         foreach ($data as $rankingData) {
             $createdRankings[] = Ranking::create([
-                'student_id' => $rankingData['student_id'],
+                'student_id' => $student_id,
                 'residency_id' => $rankingData['residency_id'],
                 'position' => $rankingData['position'],
             ]);

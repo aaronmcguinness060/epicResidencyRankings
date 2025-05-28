@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 
+use App\Models\Residency;
+
 class RegisterController extends Controller
 {
     public function register(Request $request)
@@ -22,7 +24,6 @@ class RegisterController extends Controller
             'linkedin_url'  => ['nullable', 'url', 'max:255'],
         ];
 
-        // Conditionally validate student/company fields if present
         if ($request->has('student_id')) {
             $rules['student_id'] = ['integer', 'digits:8'];
         }
@@ -47,6 +48,8 @@ class RegisterController extends Controller
             'linkedin_url'  => $request->linkedin_url ?? null,
         ]);
 
+        $company = null;
+
         // Create related Student or Company record
         if ($user->user_type == 0) {
             $user->student()->create([
@@ -54,14 +57,15 @@ class RegisterController extends Controller
                 'student_id' => $request->student_id,
             ]);
         } elseif ($user->user_type == 1) {
-            $user->company()->create([
+            $company = $user->company()->create([
                 'company_name' => $request->company_name,
             ]);
         }
 
         return response()->json([
             'message' => 'User registered successfully.',
-            'user' => $user
+            'user' => $user,
+            'company_id' => $company ? $company->id : null,
         ], 201);
     }
 }
