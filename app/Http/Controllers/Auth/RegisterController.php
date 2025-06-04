@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 
 use App\Models\Residency;
@@ -53,7 +54,7 @@ class RegisterController extends Controller
         // Create related Student or Company record
         if ($user->user_type == 0) {
             $user->student()->create([
-                'qca' => '3.00',
+                'qca' => '3.00', // In a real world application, use an API to retrieve students QCA from UL Academic Registry
                 'student_id' => $request->student_id,
             ]);
         } elseif ($user->user_type == 1) {
@@ -61,6 +62,8 @@ class RegisterController extends Controller
                 'company_name' => $request->company_name,
             ]);
         }
+
+        Auth::login($user);
 
         return response()->json([
             'message' => 'User registered successfully.',

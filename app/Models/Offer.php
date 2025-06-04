@@ -3,22 +3,30 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Ranking extends Model
+class Offer extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'student_id',
         'residency_id',
-        'position',
+        'status',
     ];
 
-    // A ranking belongs to a student (via student_id)
+    /**
+     * Relationship: Offer belongs to a Student.
+     * Assumes student_id is the foreign key linking to students.student_id.
+     */
     public function student()
     {
         return $this->belongsTo(Student::class, 'student_id', 'student_id');
     }
 
-    // A ranking belongs to a residency
+    /**
+     * Relationship: Offer belongs to a Residency.
+     */
     public function residency()
     {
         return $this->belongsTo(Residency::class);

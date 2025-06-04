@@ -25,40 +25,28 @@ class RankingsController extends Controller
         return response()->json($rankings);
     }
 
-    // Store a new ranking
     public function store(Request $request)
     {
         $user = Auth::user();
-        
-        \Log::info($user);
+        $studentId = $user->student->student_id;
+        \Log::info($studentId);
 
-        $student_id = $user->student->student_id;
+        // Validate incoming rankings data like before...
 
-        $data = $request->all();
+        // Save rankings data (or replace old rankings for this student)
+        // You might want to first delete existing rankings for this student or update them
+        Ranking::where('student_id', $studentId)->delete();
 
-        // Validate input as an array of rankings
-        $validator = Validator::make($request->all(), [
-            '*.residency_id' => ['required', 'exists:residencies,id'],
-            '*.position'     => ['required', 'integer', 'min:1'],
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        // Create rankings
-        $createdRankings = [];
-        foreach ($data as $rankingData) {
-            $createdRankings[] = Ranking::create([
-                'student_id' => $student_id,
+        foreach ($request->all() as $rankingData) {
+            Ranking::create([
+                'student_id' => $studentId,
                 'residency_id' => $rankingData['residency_id'],
                 'position' => $rankingData['position'],
             ]);
         }
 
         return response()->json([
-            'message' => 'Rankings created successfully',
-            'rankings' => $createdRankings
-        ], 201);
+            'message' => 'Rankings processed and residencies assigned',
+        ], 200);
     }
 }

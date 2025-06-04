@@ -20,4 +20,9 @@ class Company extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    public function residencies()
+    {
+        return $this->hasMany(Residency::class, 'company_id', 'company_id');
+    }
 }

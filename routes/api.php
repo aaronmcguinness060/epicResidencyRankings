@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\OffersController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
@@ -16,3 +17,7 @@ Route::post('/create-residency', [ResidenciesController::class, 'store']);
 
 Route::get('/get-rankings', [RankingsController::class, 'index']);
 Route::post('/submit-rankings', [RankingsController::class, 'store']);
+
+Route::get('/get-offers', [OffersController::class, 'index']);
+Route::post('/assign-offers', [OffersController::class, 'assignOffers']);
+Route::post('/accept-student-offers', [OffersController::class, 'acceptStudentOffers']);
