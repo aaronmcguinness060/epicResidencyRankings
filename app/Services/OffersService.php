@@ -8,13 +8,13 @@ use App\Models\Offer;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class RankingService
+class OffersService
 {
     /**
      * Process all rankings and create up to 3 offers per student,
      * considering residency capacity and avoiding duplicate offers.
      */
-    public function processRankings(): void
+    public function acceptStudentOffers(): void
     {
         DB::transaction(function () {
             // Optional: clear old pending offers before processing new ones

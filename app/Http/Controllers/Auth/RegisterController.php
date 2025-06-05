@@ -21,7 +21,7 @@ class RegisterController extends Controller
             'last_name'     => ['required', 'string', 'max:50'],
             'email'         => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password'      => ['required', 'string', 'min:8', 'confirmed'],
-            'user_type'     => ['required', 'in:0,1'], // 0 = student, 1 = company
+            'user_type'     => ['required', 'in:0,1,2'],
             'linkedin_url'  => ['nullable', 'url', 'max:255'],
         ];
 
@@ -54,7 +54,7 @@ class RegisterController extends Controller
         // Create related Student or Company record
         if ($user->user_type == 0) {
             $user->student()->create([
-                'qca' => '3.00', // In a real world application, use an API to retrieve students QCA from UL Academic Registry
+                'score' => '1', // In a real world application, use an API to retrieve students QCA from UL Academic Registry
                 'student_id' => $request->student_id,
             ]);
         } elseif ($user->user_type == 1) {

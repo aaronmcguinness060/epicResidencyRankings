@@ -12,7 +12,6 @@ class Offer extends Model
     protected $fillable = [
         'student_id',
         'residency_id',
-        'status',
     ];
 
     /**
